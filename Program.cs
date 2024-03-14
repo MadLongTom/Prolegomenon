@@ -11,16 +11,17 @@ using System.Text;
 using System.Text.Json;
 
 DdddOcr ocr = new(show_ad: false, use_gpu: false);
-List<DaAnRoot> DaAn = JsonSerializer.Deserialize<List<DaAnRoot>>(File.ReadAllText("AllShiTi.json"));
+List<DaAnRoot> DaAn = JsonSerializer.Deserialize<List<DaAnRoot>>(File.ReadAllText("AllShiTi.json"))!;
 List<Task> taskPool = [];
 foreach (var kvp in File.ReadAllLines("queryList.txt"))
 {
     if (kvp.Trim() == string.Empty) continue;
     var kv = kvp.Split(' ');
     taskPool.Add(Run(ocr, DaAn, kv[0], kv.Length > 1 ? kv[1] : "123456", taskPool));
-    await Task.WhenAll(taskPool);
-    File.WriteAllText("queryList.txt", string.Empty);
 }
+await Task.WhenAll(taskPool);
+await Task.WhenAll(taskPool); //Task.WhenAll() cant handle IEnumarable.Add() while executing
+File.WriteAllText("queryList.txt", string.Empty);
 
 static async Task Run(DdddOcr ocr, List<DaAnRoot> DaAn, string username, string password, List<Task> taskPool)
 {
@@ -54,7 +55,6 @@ static async Task Run(DdddOcr ocr, List<DaAnRoot> DaAn, string username, string 
             await WriteHelper.WriteFileAsync("out.txt", "密码错误:" + username);
             return;
         }
-
     }
     res = await GetAnPaiList(client);
     var apList = await res.Content.ReadFromJsonAsync<AnPaiRoot[]>();
@@ -62,10 +62,10 @@ static async Task Run(DdddOcr ocr, List<DaAnRoot> DaAn, string username, string 
     {
         res = await GetZuJuan(client, ap.KaoShiAnPaiID);
         var zujuan = await res.Content.ReadFromJsonAsync<ZuJuanRoot>();
-        res = await ShengChengShiJuan(client, zujuan.ShiJuanID, zujuan.ShiJuanFenLei);
+        res = await ShengChengShiJuan(client, zujuan!.ShiJuanID, zujuan.ShiJuanFenLei);
         var shijuan = await res.Content.ReadFromJsonAsync<ShiJuanRoot>();
         List<ShiTiRoot> answer = [];
-        foreach (var shiti in shijuan.rows)
+        foreach (var shiti in shijuan!.rows)
         {
             answer.Add(new()
             {
