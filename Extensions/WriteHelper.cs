@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Prolegomenon
+namespace Prolegomenon.Extensions
 {
     public static class WriteHelper
     {

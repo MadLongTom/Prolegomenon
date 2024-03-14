@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Prolegomenon
+namespace Prolegomenon.Models
 {
     internal class ShiJuanRoot
     {
